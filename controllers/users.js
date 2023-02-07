@@ -1,121 +1,91 @@
-const {request, response}=require('express');
-const Usuario=require('../models/users');
-var bcrypt = require('bcryptjs');
+const { request, response } = require("express");
+const Usuario = require("../models/users");
+var bcrypt = require("bcryptjs");
 
+const usersGET = async (req = request, res = response) => {
+  try {
+    res.json({
+      ok: 200,
+      msg: "Mensaje desde el metodo GET",
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Error en el metodo GET");
+  }
+};
 
+const usersPOST = async (req = request, res = response) => {
+  try {
+    //Vamos a insertar en la base de datos un registro
 
-const usersGET=async(req=request, res=response)=>{
+    //Los datos que nos envia el front end vienen en el body del
+    //request
+    const body = req.body;
 
-    try {
-        res.json(
-            {
-                ok:200,
-                "msg":"Mensaje desde el metodo GET"
-            }
-        );
+    //Desestructuramos lo que viene en el body
+    const { name, email, password, rol, google } = req.body;
 
-    }
-    catch(err){
-        console.log(err);
-        throw new Error('Error en el metodo GET');
-}
-}
+    //creo un objeto del tipo
+    //const usuario= new Usuario(body);
 
-const usersPOST=async(req=request, res=response)=>{
+    //Vamos a encriptar la clave, necesito un inst un paquete llamado bcryptjs
 
-        try {
-//Vamos a insertar en la base de datos un registro
+    const usuario = new Usuario({ name, email, password, rol, google });
 
-//Los datos que nos envia el front end vienen en el body del
-//request
-const body=req.body;
+    //creamos las vueltas del  encriptado
+    const salt = bcrypt.genSaltSync();
 
-//Desestructuramos lo que viene en el body
- const {name,email,password,rol,google}=req.body;
+    //Encriptamos el password
+    usuario.password = bcrypt.hashSync(password, salt);
 
+    //Vamos a revisar que el correo no se duplique al enviar una peticion
+    // Tomamos la instancia de la base de datos y revisamos si existe
 
-//creo un objeto del tipo
-//const usuario= new Usuario(body);
+    //Vamos a revisar que el email sea valido
+    //descarmagos el express-validator
 
-//Vamos a encriptar la clave, necesito un inst un paquete llamado bcryptjs
+    //Registro en la base de datos
+    await usuario.save();
 
-const usuario= new Usuario({name,email,password,rol,google});
+    //Retornamos el resultado de la llamada
+    res.json({
+      ok: 200,
+      msg: "Mensaje desde el metodo POST",
+      usuario,
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Error en el metodo POST");
+  }
+};
 
-//creamos las vueltas del  encriptado 
-const salt=bcrypt.genSaltSync();
+const usersPUT = async (req = request, res = response) => {
+  try {
+    res.json({
+      ok: 200,
+      msg: "Mensaje desde el metodo PUT",
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Error en el metodo PUT");
+  }
+};
 
-//Encriptamos el password
-usuario.password=bcrypt.hashSync(password,salt);
- 
+const usersDELETE = async (req = request, res = response) => {
+  try {
+    res.json({
+      ok: 200,
+      msg: "Mensaje desde el metodo DELETE",
+    });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Error en el metodo DELETE");
+  }
+};
 
-//Vamos a revisar que el correo no se duplique al enviar una peticion
-// Tomamos la instancia de la base de datos y revisamos si existe
-
-
-//Vamos a revisar que el email sea valido
-//descarmagos el express-validator
-
-
-
-
-//Registro en la base de datos
- await usuario.save();
-
-//Retornamos el resultado de la llamada   
-            res.json(
-                {
-                    ok:200,
-                    "msg":"Mensaje desde el metodo POST",
-                    usuario
-                }
-            );
-
-        }
-        catch(err){
-            console.log(err);
-            throw new Error('Error en el metodo POST');
-}
-}
-
-const usersPUT=async(req=request, res=response)=>{
-    try {
-        res.json(
-            {
-                ok:200,
-                "msg":"Mensaje desde el metodo PUT"
-            }
-        );
-
-    }
-    catch(err){
-        console.log(err);
-        throw new Error('Error en el metodo PUT');
-}
-}
-
-
-const usersDELETE=async(req=request, res=response)=>{
-
-    try {
-        res.json(
-            {
-                ok:200,
-                "msg":"Mensaje desde el metodo DELETE"
-            }
-        );
-
-    }
-    catch(err){
-        console.log(err);
-        throw new Error('Error en el metodo DELETE');
-}
-}
-
-
-
-module.exports={
-    usersGET,
-    usersPOST,
-    usersPUT,
-    usersDELETE
-}
+module.exports = {
+  usersGET,
+  usersPOST,
+  usersPUT,
+  usersDELETE,
+};
