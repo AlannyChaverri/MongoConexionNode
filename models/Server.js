@@ -1,46 +1,37 @@
-const express=require('express');
-require('dotenv').config();
-const MongoDBConection=require('../database/mongo');
+const express = require("express");
+require("dotenv").config();
+const MongoDBConection = require("../database/mongo");
 
+class Server {
+  constructor() {
+    this.app = express();
+    this.port = process.env.PORT;
+    this.usersPath = "/api/users";
 
-class Server{
-constructor(){
-   this.app=express();
-   this.port=process.env.PORT;
-   this.usersPath='/api/users'
+    //invocamos nuestros metodos
+    this.middleWares();
+    this.routes();
+    this.MongoDBConect();
+  }
 
-   //invocamos nuestros metodos
-   this.middleWares();
-   this.routes();
-   this.MongoDBConect();
-}
-
-
-
-
-listen(){
-    this.app.listen(this.port,()=>{
-        console.log(`El servidor esta corriendo en el puerto ${this.port}`);
+  listen() {
+    this.app.listen(this.port, () => {
+      console.log(`El servidor esta corriendo en el puerto ${this.port}`);
     });
-}
+  }
 
+  routes() {
+    this.app.use(this.usersPath, require("../routes/users"));
+  }
 
-routes(){
-this.app.use(this.usersPath,require('../routes/users'));
-}
-
-middleWares(){
+  middleWares() {
     this.app.use(express.json());
-    this.app.use(express.static('public'))
-}
+    this.app.use(express.static("public"));
+  }
 
-MongoDBConect(){
+  MongoDBConect() {
     MongoDBConection();
+  }
 }
 
-
-}
-
-
-
-module.exports=Server;
+module.exports = Server;
